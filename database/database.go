@@ -67,5 +67,5 @@ func DBMigrate() {
 		fmt.Println("Success migrating database")
 	}
 
-	fmt.Println("Applied", n, " migrations!")
+	fmt.Println("Applied", n, "migrations!")
 }

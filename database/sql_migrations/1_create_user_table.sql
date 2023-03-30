@@ -1,5 +1,6 @@
 -- +migrate Up 
 -- +migrate StatementBegin
+CREATE TYPE roles AS ENUM ('admin', 'user');
 
 CREATE TABLE users(
     id SERIAL PRIMARY KEY, 
@@ -8,7 +9,7 @@ CREATE TABLE users(
     username VARCHAR(32) UNIQUE NOT NULL, 
     password VARCHAR(255) NOT NULL,
     email VARCHAR(256) NOT NULL UNIQUE,
-    role ENUM('admin','user') NOT NULL
+    role roles NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(), 
     updated_at TIMESTAMP DEFAULT NOW()
 )
