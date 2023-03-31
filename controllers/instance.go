@@ -7,6 +7,7 @@ import (
 
 type controllerData struct {
 	CategoryController
+	UsersController
 }
 
 var serviceInstance = services.InitNewService()
@@ -16,6 +17,7 @@ var once sync.Once
 func NewController() *controllerData {
 	return &controllerData{
 		CategoryController: NewCategoryController(serviceInstance.CategoryService),
+		UsersController:    NewUsersController(serviceInstance.UsersService),
 	}
 }
 

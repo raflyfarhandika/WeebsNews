@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type CategoryController interface {
+type UsersController interface {
 	Create(c *gin.Context)
 	GetAll(c *gin.Context)
 	GetByID(c *gin.Context)
@@ -17,16 +17,16 @@ type CategoryController interface {
 	Delete(c *gin.Context)
 }
 
-type categoryController struct {
-	service services.CategoryService
+type usersController struct {
+	service services.UsersService
 }
 
-func NewCategoryController(service services.CategoryService) CategoryController {
-	return &categoryController{service}
+func NewUsersController(service services.UsersService) UsersController {
+	return &usersController{service}
 }
 
-func (controller *categoryController) Create(c *gin.Context) {
-	var request model.Category
+func (controller *usersController) Create(c *gin.Context) {
+	var request model.Users
 	err := c.ShouldBindJSON(&request)
 
 	if err != nil {
@@ -46,13 +46,20 @@ func (controller *categoryController) Create(c *gin.Context) {
 	}
 
 	response := controller.service.Create(request)
+	if response.Error != "" {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": response.Error,
+		})
+		return
+	}
+
 	c.IndentedJSON(response.StatusCode, gin.H{
 		"data" : response.Data,
-		"message" : "Category created successfully",
+		"message" : "User created successfully",
 	})
 }
 
-func (controller *categoryController) GetAll(c *gin.Context) {
+func (controller *usersController) GetAll(c *gin.Context) {
 	
 	response := controller.service.GetAll()
 
@@ -65,20 +72,20 @@ func (controller *categoryController) GetAll(c *gin.Context) {
 
 	c.IndentedJSON(response.StatusCode, gin.H{
 		"data" : response.Data,
-		"message" : "Get All Category",
+		"message" : "All users",
 	})
 }
 
-func (controller *categoryController) GetByID(c *gin.Context) {
-	userID, err := strconv.Atoi(c.Param("id"))
+func (controller *usersController) GetByID(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	response := controller.service.GetByID(int64(userID))
+	response := controller.service.GetByID(int64(id))
 	if response.Error != "" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": response.Error,
@@ -88,31 +95,38 @@ func (controller *categoryController) GetByID(c *gin.Context) {
 
 	c.IndentedJSON(response.StatusCode, gin.H{
 		"data" : response.Data,
-		"message" : "Category list",
+		"message" : "User by ID",
 	})
 }
 
-func (controller *categoryController) Update(c *gin.Context) {
-	var request model.Category
-	c.ShouldBindJSON(&request)
-
+func (controller *usersController) Update(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
+
+	var request model.Users
 	request.ID = id
+	err = c.ShouldBindJSON(&request)
 
-	isValid, error := request.ValidateRequest()
-
-	if !isValid {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"validation_error": error,
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
+
+	// isValid, error := request.ValidateRequest()
+
+	// if !isValid {
+	// 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+	// 		"validation_error": error,
+	// 	})
+	// 	return
+	// }
 
 	search := controller.service.GetByID(int64(request.ID))
 
@@ -132,20 +146,20 @@ func (controller *categoryController) Update(c *gin.Context) {
 	}
 
 	c.IndentedJSON(response.StatusCode, gin.H{
-		"message" : "Category updated successfully",
+		"message" : "User updated successfully",
 	})
 }
 
-func (controller *categoryController) Delete(c *gin.Context) {
+func (controller *usersController) Delete(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	var request model.Category
+	var request model.Users
 	request.ID = id
 
 	search := controller.service.GetByID(int64(request.ID))
@@ -166,6 +180,6 @@ func (controller *categoryController) Delete(c *gin.Context) {
 	}
 
 	c.IndentedJSON(response.StatusCode, gin.H{
-		"message" : "Category deleted successfully",
+		"message" : "User deleted successfully",
 	})
 }

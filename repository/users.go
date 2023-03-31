@@ -26,12 +26,13 @@ func NewUsersRepository() UsersRepository {
 func (users *usersRepository) Create(request model.Users) (model.Users, error) {
 	var result model.Users
 
-	statement := "INSERT INTO users (first_name, last_name, username, password, email) VALUES ($1, $2, $3, $4, $5) RETURNING id, first_name, last_name, username, password, email, created_at, updated_at"
+	statement := `INSERT INTO users (first_name, last_name, username, password, email, role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, first_name, last_name, username, password, email, role, created_at, updated_at`
 
 	request.HashPassword()
+	request.Role = "user"
 
-	err := users.db.QueryRow(statement, &request.FirstName, &request.LastName, &request.Username, &request.Password, &request.Email).
-		Scan(&result.ID, &result.FirstName, &result.LastName, &result.Username, &result.Email, &result.CreatedAt, &result.UpdatedAt)
+	err := users.db.QueryRow(statement, &request.FirstName, &request.LastName, &request.Username, &request.Password, &request.Email, &request.Role).
+		Scan(&result.ID, &result.FirstName, &result.LastName, &result.Username, &result.Password, &result.Email, &result.Role, &result.CreatedAt, &result.UpdatedAt)
 
 	if err != nil {
 		return model.Users{}, err

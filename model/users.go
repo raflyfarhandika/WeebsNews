@@ -34,6 +34,10 @@ func validateEmail(email string) bool {
 	return match
 }
 
+func validateEmailUnique(email string) bool {
+	return true
+}
+
 func validatePassword(password string, minLength int) bool {
 	return utf8.RuneCountInString(password) >= minLength
 }
@@ -88,6 +92,9 @@ func (u *Users) ValidateRequest() (bool, map[string]string) {
 	} else if !validateEmail(u.Email) {
 		isValid = false
 		response["email"] = "Email is not valid"
+	} else if !validateEmailUnique(u.Email) {
+		isValid = false
+		response["email"] = "Email is already taken"
 	}
 
 	return isValid, response

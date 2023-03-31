@@ -55,9 +55,7 @@ func (service *categoryService) GetAll() model.Response {
 	return model.Response{
 		Error: "",
 		StatusCode: 200,
-		Data: map[string]interface{}{
-			"categories": result,
-		},
+		Data: result,
 	}
 }
 
@@ -75,9 +73,7 @@ func (service *categoryService) GetByID(id int64) model.Response {
 	return model.Response{
 		Error: "",
 		StatusCode: 200,
-		Data: map[string]interface{}{
-			"category": result,
-		},
+		Data: result,
 	}
 }
 
