@@ -9,6 +9,7 @@ type serviceData struct {
 	CategoryService
 	UsersService
 	NewsService
+	CommentService
 }
 
 var repositoryInstance = repository.InitNewRepository()
@@ -20,6 +21,7 @@ func NewService() *serviceData {
 		CategoryService:	NewCategoryService(repositoryInstance.CategoryRepository),
 		UsersService:		NewUsersService(repositoryInstance.UsersRepository),
 		NewsService:		NewNewsService(repositoryInstance.NewsRepository),
+		CommentService:		NewCommentService(repositoryInstance.CommentRepository),
 	}
 }
 

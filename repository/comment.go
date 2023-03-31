@@ -10,9 +10,9 @@ import (
 type CommentRepository interface {
 	Create(request model.Comment) (model.Comment, error)
 	GetCommentByNewsId(request model.Comment) ([]model.Comment, error)
-	// GetCommentById(request model.Comment) (model.Comment, error)
+	GetCommentById(id int) (model.Comment, error)
 	Update(request model.Comment) error
-	Delete(request model.Comment) error
+	Delete(id int) error
 }
 
 type commentRepository struct {
@@ -26,21 +26,9 @@ func NewCommentRepository() CommentRepository {
 func (comment *commentRepository) Create(request model.Comment) (model.Comment, error) {
 	var result model.Comment
 
-	statement := `INSERT INTO comment (news_id
-									   user_id,
-									   comment)
-							  VALUES ($1, $2, $3)
-							  RETURNING id,
-							  			news_id,
-										user_id,
-										comment,
-										created_at,
-										updated_at`
+	statement := `INSERT INTO comment (news_id, user_id, comment) VALUES($1, $2, $3) RETURNING id, news_id, user_id, comment, created_at, updated_at`
 	
-	err := comment.db.QueryRow(statement,
-							   request.NewsID,
-							   request.UserID,
-							   request.Comment).
+	err := comment.db.QueryRow(statement, &request.NewsID, &request.UserID, &request.Comment).
 		   Scan(&result.ID,
 				&result.NewsID,
 				&result.UserID,
@@ -90,31 +78,31 @@ func (comment *commentRepository) GetCommentByNewsId(request model.Comment) ([]m
 	return result, nil
 }
 
-// func (comment *commentRepository) GetCommentById(request model.Comment) (model.Comment, error) {
-// 	var result model.Comment
+func (comment *commentRepository) GetCommentById(id int) (model.Comment, error) {
+	var result model.Comment
 
-// 	statement := `SELECT id,
-// 						 news_id,
-// 						 user_id,
-// 						 comment,
-// 						 created_at,
-// 						 updated_at
-// 				  FROM comment
-// 				  WHERE id = $1`
+	statement := `SELECT id,
+						 news_id,
+						 user_id,
+						 comment,
+						 created_at,
+						 updated_at
+				  FROM comment
+				  WHERE id = $1`
 
-// 	err := comment.db.QueryRow(statement, request.ID).
-// 		   Scan(&result.ID,
-// 				&result.NewsID,
-// 				&result.UserID,
-// 				&result.Comment,
-// 				&result.CreatedAt,
-// 				&result.UpdatedAt)
-// 	if err != nil {
-// 		return model.Comment{}, err
-// 	}
+	err := comment.db.QueryRow(statement, id).
+		   Scan(&result.ID,
+				&result.NewsID,
+				&result.UserID,
+				&result.Comment,
+				&result.CreatedAt,
+				&result.UpdatedAt)
+	if err != nil {
+		return model.Comment{}, err
+	}
 
-// 	return result, nil
-// }
+	return result, nil
+}
 
 func (comment *commentRepository) Update(request model.Comment) error {
 	statement := `UPDATE comment
@@ -127,10 +115,10 @@ func (comment *commentRepository) Update(request model.Comment) error {
 	return err.Err()
 }
 
-func (comment *commentRepository) Delete(request model.Comment) error {
+func (comment *commentRepository) Delete(id int) error {
 	statement := `DELETE FROM comment WHERE id = $1`
 
-	err := comment.db.QueryRow(statement, request.ID)
+	err := comment.db.QueryRow(statement, id)
 
 	return err.Err()
 }

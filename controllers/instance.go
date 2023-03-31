@@ -9,6 +9,7 @@ type controllerData struct {
 	CategoryController
 	UsersController
 	NewsController
+	CommentController
 }
 
 var serviceInstance = services.InitNewService()
@@ -20,6 +21,7 @@ func NewController() *controllerData {
 		CategoryController: NewCategoryController(serviceInstance.CategoryService),
 		UsersController:    NewUsersController(serviceInstance.UsersService),
 		NewsController:     NewNewsController(serviceInstance.NewsService),
+		CommentController:  NewCommentController(serviceInstance.CommentService),
 	}
 }
 
