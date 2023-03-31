@@ -4,7 +4,6 @@
 CREATE TABLE news(
     id SERIAL PRIMARY KEY, 
     user_id INTEGER NOT NULL REFERENCES users(id),
-    news_category_id INTEGER NOT NULL REFERENCES category(id),
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     thumbnail TEXT,

@@ -70,7 +70,7 @@ func (controller *categoryController) GetAll(c *gin.Context) {
 }
 
 func (controller *categoryController) GetByID(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	userID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
@@ -78,10 +78,7 @@ func (controller *categoryController) GetByID(c *gin.Context) {
 		return
 	}
 
-	var request model.Category
-	request.ID = id
-
-	response := controller.service.GetByID(request)
+	response := controller.service.GetByID(int64(userID))
 	if response.Error != "" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": response.Error,

@@ -3,10 +3,10 @@ package repository
 import "sync"
 
 type repositoryData struct {
-	// UserRepository
-	// NewsRepository
+	UsersRepository
+	NewsRepository
 	CategoryRepository
-	// CommentRepository
+	CommentRepository
 }
 
 var repositoryInstance *repositoryData
@@ -14,10 +14,10 @@ var once sync.Once
 
 func NewRepository() *repositoryData {
 	return &repositoryData{
-		// UserRepository:     NewUserRepository(),
-		// NewsRepository:     NewNewsRepository(),
+		UsersRepository:     NewUsersRepository(),
+		NewsRepository:     NewNewsRepository(),
 		CategoryRepository: NewCategoryRepository(),
-		// CommentRepository:  NewCommentRepository(),
+		CommentRepository:  NewCommentRepository(),
 	}
 }
 

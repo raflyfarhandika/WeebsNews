@@ -10,7 +10,7 @@ import (
 type CategoryRepository interface {
 	Create(request model.Category) (model.Category, error)
 	GetAll() ([]model.Category, error)
-	GetByID(request model.Category) (model.Category, error)
+	GetByID(id int64) (model.Category, error)
 	Update(request model.Category) error
 	Delete(request model.Category) error
 }
@@ -63,12 +63,12 @@ func (category *categoryRepository) GetAll() ([]model.Category, error) {
 	return result, nil
 }
 
-func (category *categoryRepository) GetByID(request model.Category) (model.Category, error) {
+func (category *categoryRepository) GetByID(id int64) (model.Category, error) {
 	var result model.Category
 
 	statement := "SELECT * FROM category WHERE id = $1"
 
-	err := category.db.QueryRow(statement, request.ID).
+	err := category.db.QueryRow(statement, id).
 		Scan(&result.ID, &result.CategoryName, &result.CreatedAt, &result.UpdatedAt)
 
 	if err != nil {
