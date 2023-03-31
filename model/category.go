@@ -9,6 +9,14 @@ type Category struct {
 	UpdatedAt		time.Time `json:"updated_at"`
 }
 
+type CategoryRelation struct {
+	ID				int       `json:"id"`
+	NewsID			int       `json:"news_id"`
+	CategoryID		int       `json:"category_id"`
+	CreatedAt		time.Time `json:"created_at"`
+	UpdatedAt		time.Time `json:"updated_at"`
+}
+
 func (c *Category) ValidateRequest() (bool, map[string]string) {
 	var response = make(map[string]string)
 	var isValid = true

@@ -13,6 +13,7 @@ type NewsController interface {
 	Create(c *gin.Context)
 	GetAllNews(c *gin.Context)
 	GetNewsById(c *gin.Context)
+	GetAllNewsContentById (c *gin.Context)
 	Update(c *gin.Context)
 	Delete(c *gin.Context)
 }
@@ -94,6 +95,29 @@ func (controller *newsController) GetNewsById(c *gin.Context) {
 
 	c.IndentedJSON(response.StatusCode, gin.H{
 		"data" : response.Data,
+		"message" : "News fetched successfully",
+	})
+}
+
+func (controller *newsController) GetAllNewsContentById (c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	response, err := controller.service.GetNewsWithCategoriesAndCommentsByID(id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{
+		"data" : response,
 		"message" : "News fetched successfully",
 	})
 }

@@ -31,6 +31,7 @@ func main() {
 	router.POST("/news", controllerInstance.NewsController.Create)
 	router.GET("/news", controllerInstance.NewsController.GetAllNews)
 	router.GET("/news/:id", controllerInstance.NewsController.GetNewsById)
+	router.GET("/news/:id/detail", controllerInstance.NewsController.GetAllNewsContentById)
 	router.PUT("/news/:id", controllerInstance.NewsController.Update)
 	router.DELETE("/news/:id", controllerInstance.NewsController.Delete)
 

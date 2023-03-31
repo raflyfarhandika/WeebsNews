@@ -11,6 +11,8 @@ type NewsRepository interface {
 	Create(request model.News) (model.News, error)
 	GetAllNews() ([]model.News, error)
 	GetNewsById(id int) (model.News, error)
+	GetCategoriesByNewsId(id int) ([]model.Category, error)
+	GetCommentsByNewsId(id int) ([]model.Comment, error)
 	Update(request model.News) error
 	Delete(id int) error
 }
@@ -123,6 +125,59 @@ func (news *newsRepository) GetNewsById(id int) (model.News, error) {
 	}
 
 	return result, nil
+}
+
+func (news *newsRepository) GetCategoriesByNewsId(id int) ([]model.Category, error) {
+	var categories []model.Category
+
+	statement := ` SELECT category.id, category.category_name
+				   FROM category
+				   JOIN category_relations ON category.id = category_relations.category_id
+				   WHERE category_relations.news_id = $1`
+	
+	rows, err := news.db.Query(statement, id)
+	if err != nil {
+		return []model.Category{}, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var category model.Category
+		err = rows.Scan(&category.ID, &category.CategoryName)
+		if err != nil {
+			return []model.Category{}, err
+		}
+
+		categories = append(categories, category)
+	}
+
+	return categories, nil
+}
+
+func (news *newsRepository) GetCommentsByNewsId(id int) ([]model.Comment, error) {
+	var comments []model.Comment
+
+	statement := `SELECT id, news_id, user_id, comment, created_at, updated_at
+				  FROM comment
+				  WHERE news_id = $1`
+
+	rows, err := news.db.Query(statement, id)
+	if err != nil {
+		return []model.Comment{}, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var comment model.Comment
+		err = rows.Scan(&comment.ID, &comment.NewsID, &comment.UserID, &comment.Comment, &comment.CreatedAt, &comment.UpdatedAt)
+		if err != nil {
+			return []model.Comment{}, err
+		}
+
+		comments = append(comments, comment)
+	}
+
+	return comments, nil
 }
 
 func (news *newsRepository) Update(request model.News) error {

@@ -9,6 +9,7 @@ type NewsService interface {
 	Create(request model.News) model.Response
 	GetAllNews() model.Response
 	GetNewsById(id int) model.Response
+	GetNewsWithCategoriesAndCommentsByID(id int) (model.News, error)
 	Update(request model.News) model.Response
 	Delete(id int) model.Response
 }
@@ -73,6 +74,30 @@ func (service *newsService) GetNewsById(id int) model.Response {
 		StatusCode: 200,
 		Data:       result,
 	}
+}
+
+func (service *newsService) GetNewsWithCategoriesAndCommentsByID(id int) (model.News, error) {
+	var news model.News
+
+	news, err := service.repo.GetNewsById(id)
+	if err != nil {
+		return model.News{}, err
+	}
+
+	categories, err := service.repo.GetCategoriesByNewsId(id)
+	if err != nil {
+		return model.News{}, err
+	}
+	news.Categories = categories
+
+	comments, err := service.repo.GetCommentsByNewsId(id)
+	if err != nil {
+		return model.News{}, err
+	}
+
+	news.Comments = comments
+
+	return news, nil
 }
 
 func (service *newsService) Update(news model.News) model.Response {
