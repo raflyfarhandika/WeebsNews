@@ -10,9 +10,9 @@ import (
 type CategoryRepository interface {
 	Create(request model.Category) (model.Category, error)
 	GetAll() ([]model.Category, error)
-	GetByID(id int64) (model.Category, error)
+	GetByID(id int) (model.Category, error)
 	Update(request model.Category) error
-	Delete(request model.Category) error
+	Delete(id int) error
 }
 
 type categoryRepository struct {
@@ -63,7 +63,7 @@ func (category *categoryRepository) GetAll() ([]model.Category, error) {
 	return result, nil
 }
 
-func (category *categoryRepository) GetByID(id int64) (model.Category, error) {
+func (category *categoryRepository) GetByID(id int) (model.Category, error) {
 	var result model.Category
 
 	statement := "SELECT * FROM category WHERE id = $1"
@@ -86,10 +86,10 @@ func (category *categoryRepository) Update(request model.Category) error {
 	return err.Err()
 }
 
-func (category *categoryRepository) Delete(request model.Category) error {
+func (category *categoryRepository) Delete(id int) error {
 	statement := "DELETE FROM category WHERE id = $1"
 
-	err := category.db.QueryRow(statement, &request.ID)
+	err := category.db.QueryRow(statement, id)
 
 	return err.Err()
 }

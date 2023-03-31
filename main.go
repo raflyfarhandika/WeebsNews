@@ -27,6 +27,12 @@ func main() {
 	router.GET("/users/:id", controllerInstance.UsersController.GetByID)
 	router.PUT("/users/:id", controllerInstance.UsersController.Update)
 	router.DELETE("/users/:id", controllerInstance.UsersController.Delete)
+
+	router.POST("/news", controllerInstance.NewsController.Create)
+	router.GET("/news", controllerInstance.NewsController.GetAllNews)
+	router.GET("/news/:id", controllerInstance.NewsController.GetNewsById)
+	router.PUT("/news/:id", controllerInstance.NewsController.Update)
+	router.DELETE("/news/:id", controllerInstance.NewsController.Delete)
 	
 	router.Run("localhost:5000")
 

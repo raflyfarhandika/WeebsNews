@@ -9,24 +9,24 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UsersController interface {
+type NewsController interface {
 	Create(c *gin.Context)
-	GetAll(c *gin.Context)
-	GetByID(c *gin.Context)
+	GetAllNews(c *gin.Context)
+	GetNewsById(c *gin.Context)
 	Update(c *gin.Context)
 	Delete(c *gin.Context)
 }
 
-type usersController struct {
-	service services.UsersService
+type newsController struct {
+	service services.NewsService
 }
 
-func NewUsersController(service services.UsersService) UsersController {
-	return &usersController{service}
+func NewNewsController(service services.NewsService) NewsController{
+	return &newsController{service}
 }
 
-func (controller *usersController) Create(c *gin.Context) {
-	var request model.Users
+func (controller *newsController) Create(c *gin.Context) {
+	var request model.News
 	err := c.ShouldBindJSON(&request)
 
 	if err != nil {
@@ -55,13 +55,12 @@ func (controller *usersController) Create(c *gin.Context) {
 
 	c.IndentedJSON(response.StatusCode, gin.H{
 		"data" : response.Data,
-		"message" : "User created successfully",
-	})
+		"message" : "News created successfully",
+	})	
 }
 
-func (controller *usersController) GetAll(c *gin.Context) {
-	
-	response := controller.service.GetAll()
+func (controller *newsController) GetAllNews(c *gin.Context) {
+	response := controller.service.GetAllNews()
 
 	if response.Error != "" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -72,11 +71,11 @@ func (controller *usersController) GetAll(c *gin.Context) {
 
 	c.IndentedJSON(response.StatusCode, gin.H{
 		"data" : response.Data,
-		"message" : "All users",
+		"message" : "News fetched successfully",
 	})
 }
 
-func (controller *usersController) GetByID(c *gin.Context) {
+func (controller *newsController) GetNewsById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -85,7 +84,7 @@ func (controller *usersController) GetByID(c *gin.Context) {
 		return
 	}
 
-	response := controller.service.GetByID(int(id))
+	response := controller.service.GetNewsById(int(id))
 	if response.Error != "" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": response.Error,
@@ -95,20 +94,20 @@ func (controller *usersController) GetByID(c *gin.Context) {
 
 	c.IndentedJSON(response.StatusCode, gin.H{
 		"data" : response.Data,
-		"message" : "User by ID",
+		"message" : "News fetched successfully",
 	})
 }
 
-func (controller *usersController) Update(c *gin.Context) {
+func (controller *newsController) Update(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	var request model.Users
+	var request model.News
 	request.ID = id
 	err = c.ShouldBindJSON(&request)
 
@@ -128,7 +127,7 @@ func (controller *usersController) Update(c *gin.Context) {
 	// 	return
 	// }
 
-	search := controller.service.GetByID(int(request.ID))
+	search := controller.service.GetNewsById(int(request.ID))
 
 	if search.Error != "" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -146,11 +145,11 @@ func (controller *usersController) Update(c *gin.Context) {
 	}
 
 	c.IndentedJSON(response.StatusCode, gin.H{
-		"message" : "User updated successfully",
+		"message" : "News updated successfully",
 	})
 }
 
-func (controller *usersController) Delete(c *gin.Context) {
+func (controller *newsController) Delete(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -159,10 +158,10 @@ func (controller *usersController) Delete(c *gin.Context) {
 		return
 	}
 
-	var request model.Users
+	var request model.News
 	request.ID = id
 
-	search := controller.service.GetByID(int(request.ID))
+	search := controller.service.GetNewsById(int(request.ID))
 
 	if search.Error != "" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -180,6 +179,6 @@ func (controller *usersController) Delete(c *gin.Context) {
 	}
 
 	c.IndentedJSON(response.StatusCode, gin.H{
-		"message" : "User deleted successfully",
+		"message" : "News deleted successfully",
 	})
 }

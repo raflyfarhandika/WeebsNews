@@ -8,6 +8,7 @@ import (
 type serviceData struct {
 	CategoryService
 	UsersService
+	NewsService
 }
 
 var repositoryInstance = repository.InitNewRepository()
@@ -18,6 +19,7 @@ func NewService() *serviceData {
 	return &serviceData{
 		CategoryService:	NewCategoryService(repositoryInstance.CategoryRepository),
 		UsersService:		NewUsersService(repositoryInstance.UsersRepository),
+		NewsService:		NewNewsService(repositoryInstance.NewsRepository),
 	}
 }
 

@@ -70,7 +70,7 @@ func (controller *categoryController) GetAll(c *gin.Context) {
 }
 
 func (controller *categoryController) GetByID(c *gin.Context) {
-	userID, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
@@ -78,7 +78,7 @@ func (controller *categoryController) GetByID(c *gin.Context) {
 		return
 	}
 
-	response := controller.service.GetByID(int64(userID))
+	response := controller.service.GetByID(int(id))
 	if response.Error != "" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": response.Error,
@@ -114,7 +114,7 @@ func (controller *categoryController) Update(c *gin.Context) {
 		return
 	}
 
-	search := controller.service.GetByID(int64(request.ID))
+	search := controller.service.GetByID(int(request.ID))
 
 	if search.Error != "" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -148,7 +148,7 @@ func (controller *categoryController) Delete(c *gin.Context) {
 	var request model.Category
 	request.ID = id
 
-	search := controller.service.GetByID(int64(request.ID))
+	search := controller.service.GetByID(int(request.ID))
 
 	if search.Error != "" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -157,7 +157,7 @@ func (controller *categoryController) Delete(c *gin.Context) {
 		return
 	}
 
-	response := controller.service.Delete(request)
+	response := controller.service.Delete(id)
 	if response.Error != "" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": response.Error,

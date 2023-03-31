@@ -10,9 +10,9 @@ import (
 type NewsRepository interface {
 	Create(request model.News) (model.News, error)
 	GetAllNews() ([]model.News, error)
-	GetNewsById(id int64) (model.News, error)
+	GetNewsById(id int) (model.News, error)
 	Update(request model.News) error
-	Delete(request model.News) error
+	Delete(id int) error
 }
 
 type newsRepository struct {
@@ -30,11 +30,12 @@ func (news *newsRepository) Create(request model.News) (model.News, error) {
 									title, 
 									content, 
 									thumbnail) 
-							  VALUES ($1, $2, $3, $4, $5) 
+							  VALUES ($1, $2, $3, $4) 
 							  RETURNING id, 
 							  			user_id,  
 										title, 
-										content, 
+										content,
+										thumbnail, 
 										created_at, 
 										updated_at`
 
@@ -46,7 +47,8 @@ func (news *newsRepository) Create(request model.News) (model.News, error) {
 		Scan(&result.ID, 
 			 &result.UserID,
 			 &result.Title, 
-			 &result.Content, 
+			 &result.Content,
+			 &result.Thumbnail,
 			 &result.CreatedAt, 
 			 &result.UpdatedAt)
 
@@ -71,24 +73,33 @@ func (news *newsRepository) GetAllNews () ([]model.News, error) {
 
 	for rows.Next() {
 		var data model.News
+		var thumbnail sql.NullString
 		err = rows.Scan(&data.ID, 
 						&data.UserID, 
 						&data.Title, 
 						&data.Content, 
-						&data.Thumbnail, 
+						&thumbnail, 
 						&data.CreatedAt, 
 						&data.UpdatedAt)
 		if err != nil {
 			return []model.News{}, err
 		}
+
+		if thumbnail.Valid { // cek apakah nilai thumbnail valid atau tidak
+			data.Thumbnail = thumbnail.String // jika valid, gunakan nilai thumbnail yang ditemukan
+		} else {
+			data.Thumbnail = "" // jika tidak valid, gunakan nilai default
+		}
+
 		result = append(result, data)
 	}
 
 	return result, nil
 }
 
-func (news *newsRepository) GetNewsById(id int64) (model.News, error) {
+func (news *newsRepository) GetNewsById(id int) (model.News, error) {
 	var result model.News
+	var thumbnail sql.NullString
 
 	statement := "SELECT * FROM news WHERE id = $1"
 
@@ -97,12 +108,18 @@ func (news *newsRepository) GetNewsById(id int64) (model.News, error) {
 			 &result.UserID, 
 			 &result.Title, 
 			 &result.Content, 
-			 &result.Thumbnail, 
+			 &thumbnail, 
 			 &result.CreatedAt, 
 			 &result.UpdatedAt)
 
 	if err != nil {
 		return model.News{}, err
+	}
+
+	if thumbnail.Valid { 
+		result.Thumbnail = thumbnail.String 
+	} else {
+		result.Thumbnail = ""
 	}
 
 	return result, nil
@@ -120,10 +137,10 @@ func (news *newsRepository) Update(request model.News) error {
 	return err.Err()
 }
 
-func (news *newsRepository) Delete(request model.News) error {
+func (news *newsRepository) Delete(id int) error {
 	statement := "DELETE FROM news WHERE id = $1"
 
-	err := news.db.QueryRow(statement, request.ID)
+	err := news.db.QueryRow(statement, id)
 
 	return err.Err()
 }

@@ -10,9 +10,9 @@ import (
 type UsersRepository interface {
 	Create(request model.Users) (model.Users, error)
 	GetAll() ([]model.Users, error)
-	GetByID(id int64) (model.Users, error)
+	GetByID(id int) (model.Users, error)
 	Update(request model.Users) error
-	Delete(request model.Users) error
+	Delete(id int) error
 }
 
 type usersRepository struct {
@@ -65,7 +65,7 @@ func (users *usersRepository) GetAll() ([]model.Users, error) {
 	return result, nil
 }
 
-func (users *usersRepository) GetByID(id int64) (model.Users, error) {
+func (users *usersRepository) GetByID(id int) (model.Users, error) {
 	var result model.Users
 
 	statement := "SELECT id, first_name, last_name, username, email, role, created_at, updated_at FROM users WHERE id = $1"
@@ -88,10 +88,10 @@ func (users *usersRepository) Update(request model.Users) error {
 	return err.Err()
 }
 
-func (users *usersRepository) Delete(request model.Users) error {
+func (users *usersRepository) Delete(id int) error {
 	statement := "DELETE FROM users WHERE id = $1"
 
-	err := users.db.QueryRow(statement, &request.ID)
+	err := users.db.QueryRow(statement, id)
 
 	return err.Err()
 }

@@ -8,9 +8,9 @@ import (
 type CategoryService interface {
 	Create(request model.Category) model.Response
 	GetAll() model.Response
-	GetByID(id int64) model.Response
+	GetByID(id int) model.Response
 	Update(request model.Category) model.Response
-	Delete(request model.Category) model.Response
+	Delete(id int) model.Response
 }
 
 type categoryService struct {
@@ -59,7 +59,7 @@ func (service *categoryService) GetAll() model.Response {
 	}
 }
 
-func (service *categoryService) GetByID(id int64) model.Response {
+func (service *categoryService) GetByID(id int) model.Response {
 	result, err := service.repo.GetByID(id)
 
 	if err != nil{
@@ -95,8 +95,8 @@ func (service *categoryService) Update(category model.Category) model.Response {
 	}
 }
 
-func (service *categoryService) Delete(category model.Category) model.Response {
-	err := service.repo.Delete(category)
+func (service *categoryService) Delete(id int) model.Response {
+	err := service.repo.Delete(id)
 
 	if err != nil{
 		return model.Response{
