@@ -2,8 +2,10 @@ package repository
 
 import (
 	"database/sql"
+	"strconv"
 
 	"weebsnews/database"
+	"weebsnews/helper"
 	"weebsnews/model"
 )
 
@@ -13,6 +15,8 @@ type UsersRepository interface {
 	GetByID(id int) (model.Users, error)
 	Update(request model.Users) error
 	Delete(id int) error
+	Login(request model.UsersLogin) (model.UsersLogin, error)
+	Register(request model.Users) (model.Users, error)
 }
 
 type usersRepository struct {
@@ -94,4 +98,51 @@ func (users *usersRepository) Delete(id int) error {
 	err := users.db.QueryRow(statement, id)
 
 	return err.Err()
+}
+
+func (users *usersRepository) Login(request model.UsersLogin) (model.UsersLogin, error) {
+	var result model.UsersLogin
+
+	statement := "SELECT id, role FROM users WHERE username = $1 and password = $2"
+
+	err := users.db.QueryRow(statement, &request.Username, &request.Password).
+		Scan(&result.ID, &result.Role)
+	
+	if err != nil {
+		return model.UsersLogin{}, err
+	}
+
+	var token string
+
+	resultID := strconv.Itoa(result.ID)
+
+	if result != (model.UsersLogin{}) {
+		token, err = helper.GetToken(resultID)
+
+		if err != nil {
+			return result, err
+		}
+	}
+
+	result.Token = token
+
+	return result, nil
+}
+
+func (users *usersRepository) Register(request model.Users) (model.Users, error) {
+	var result model.Users
+
+	statement := `INSERT INTO users (first_name, last_name, username, password, email, role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, first_name, last_name, username, password, email, role, created_at, updated_at`
+
+	request.HashPassword()
+	request.Role = "user"
+
+	err := users.db.QueryRow(statement, &request.FirstName, &request.LastName, &request.Username, &request.Password, &request.Email, &request.Role).
+		Scan(&result.ID, &result.FirstName, &result.LastName, &result.Username, &result.Password, &result.Email, &result.Role, &result.CreatedAt, &result.UpdatedAt)
+
+	if err != nil {
+		return model.Users{}, err
+	}
+
+	return result, nil
 }

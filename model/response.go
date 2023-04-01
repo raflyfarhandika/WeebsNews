@@ -5,3 +5,8 @@ type Response struct {
 	StatusCode int
 	Data       interface{}
 }
+
+type LoginResponse struct {
+	Response
+	Token string `json:"token"`
+}

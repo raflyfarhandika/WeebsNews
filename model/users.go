@@ -27,6 +27,11 @@ type Users struct {
 	UpdatedAt		time.Time `json:"updated_at"`
 }
 
+type UsersLogin struct {
+	Users
+	Token string `json:"token"`
+}
+
 func validateEmail(email string) bool {
 	regex := `^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`
 
